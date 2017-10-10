@@ -24,6 +24,13 @@ fn cross (rows: &[char], cols: &[char]) -> Vec<String> {
     v
 }
 
+pub enum PuzzleError {
+    InvalidGrid,
+    Contradiction
+}
+
+pub type PuzzleResult = Result<HashMap<String, Vec<char>>, PuzzleError>;
+
 pub struct Sudoku {
     ctx: Context
 }
@@ -72,29 +79,33 @@ impl Sudoku {
     }
 
 
-    fn grid_values (&self, grid: &str) -> HashMap<String, Vec<char>> {
+    fn grid_values (&self, grid: &str) -> PuzzleResult {
         //  Convert grid into a dict of (square, char Vec) with '0' or '.' for empties.
         let grid_chars: Vec<Vec<char>> = grid.chars().filter(|ch| self.ctx.cols.contains(ch) || ['0', '.'].contains(ch)).map(|ch| vec![ch]).collect();
-        assert_eq!(grid_chars.len(), 81);
-        let mut grid_values = HashMap::<String, Vec<char>>::new();
-        grid_values.extend(self.ctx.squares.iter().cloned().zip(grid_chars.into_iter()));
-        grid_values
+        if grid_chars.len() == 81 {
+            let mut grid_values = HashMap::<String, Vec<char>>::new();
+            grid_values.extend(self.ctx.squares.iter().cloned().zip(grid_chars.into_iter()));
+            Ok(grid_values)
+        } else {
+            Err(PuzzleError::InvalidGrid)
+        }
     }
 
-    fn parse_grid (&self, grid: &str) -> Option<HashMap<String, Vec<char>>> {
+    fn parse_grid (&self, grid: &str) -> PuzzleResult {
         //  Convert grid to Some dict of possible values, [square, digits], or return None if a contradiction is detected.
         let mut values = HashMap::<String, Vec<char>>::with_capacity(81);
         for s in &self.ctx.squares { 
             values.insert(s.clone(), self.ctx.cols.clone());
         }
-        for (s, gvalues) in &self.grid_values(grid) {
+        let grid_values = self.grid_values(grid)?;
+        for (s, gvalues) in &grid_values {
             for d in gvalues {
                 if self.ctx.cols.contains(d) && !self.assign(&mut values, s, d) {
-                    return None;
+                    return Err(PuzzleError::Contradiction);
                 }
             }
         }
-        Some(values)
+        Ok(values)
     }
 
     fn assign (&self, values: &mut HashMap<String, Vec<char>>, s: &str, d: &char) -> bool {
@@ -147,36 +158,35 @@ impl Sudoku {
         lines
     }
 
-    fn search (&self, values: HashMap<String, Vec<char>>) -> Option<HashMap<String, Vec<char>>> {
+    fn search (&self, values: HashMap<String, Vec<char>>) -> PuzzleResult {
         // Using depth-first search and propagation, try all possible values
         if values.iter().all(|(_, v)| v.len() == 1) {
-            return Some(values);  // Solved!
+            return Ok(values);  // Solved!
         }
         // Choose the unfilled square s with the fewest possibilities
         let (_, s) = values.iter().filter(|&(_, v)| v.len() > 1).map(|(s, v)| (v.len(), s)).min().unwrap();
         for d in &values[s] {
             let mut cloned_values = values.clone();
             if self.assign(&mut cloned_values, s, d) {
-                if let Some(svalues) = self.search(cloned_values) {
-                    return Some(svalues);
-                }  
+                return Ok(self.search(cloned_values)?);
             }
         }
-        None
+        Err(PuzzleError::Contradiction)
     }
 
-    pub fn solve (&self, grid: &str) -> Option<HashMap<String, Vec<char>>> {
-        self.parse_grid(grid).and_then(|v| self.search(v))
+    pub fn solve (&self, grid: &str) -> PuzzleResult {
+        let values = self.parse_grid(grid)?;
+        Ok(self.search(values)?)
     }
 
-    fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
+    fn solved (&self, values: &HashMap<String, Vec<char>>) -> bool {
         //  A puzzle is solved if each unit is a permutation of the digits 1 to 9.  
         let unitsolved = |unit: &Vec<String>| {
             let mut digits_values = unit.iter().map(|s| values[s].iter().collect::<String>()).collect::<Vec<String>>();
             digits_values.sort();
-            digits_values == ctx.cols.iter().map(char::to_string).collect::<Vec<String>>()
+            digits_values == self.ctx.cols.iter().map(char::to_string).collect::<Vec<String>>()
         };
-        ctx.unitlist.iter().all(|u| unitsolved(u))
+        self.ctx.unitlist.iter().all(|u| unitsolved(u))
     }  
 }
 
