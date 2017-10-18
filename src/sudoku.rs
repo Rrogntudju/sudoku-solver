@@ -1,5 +1,6 @@
 // From Peter Norvig’s Sudoku solver     http://www.norvig.com/sudoku.html
 use std::collections::{HashMap};
+use std::fmt;
 
 #[derive(Debug)]
 struct Context {
@@ -24,12 +25,24 @@ fn cross (rows: &[char], cols: &[char]) -> Vec<String> {
     v
 }
 
+#[derive(Debug)]
 pub enum PuzzleError {
     InvalidGrid,
-    Contradiction
+    Contradiction,
+    Unsolved
 }
 
-pub type PuzzleResult = Result<HashMap<String, Vec<char>>, PuzzleError>;
+impl fmt::Display for PuzzleError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            PuzzleError::InvalidGrid => write!(f, "Invalid Grid.  Provide a string of 81 digits with 0 or . for empties."),
+            PuzzleError::Contradiction => write!(f, "A contradiction occured. The puzzle is unsolvable."),
+            PuzzleError::Unsolved => write!(f, "The puzzle is unsolvable.")
+        }
+    }
+}
+
+type PuzzleResult<T> = Result<T, PuzzleError>;
 
 pub struct Sudoku {
     ctx: Context
@@ -79,7 +92,7 @@ impl Sudoku {
     }
 
 
-    fn grid_values (&self, grid: &str) -> PuzzleResult {
+    fn grid_values (&self, grid: &str) -> PuzzleResult<HashMap<String, Vec<char>>> {
         //  Convert grid into a dict of (square, char Vec) with '0' or '.' for empties.
         let grid_chars: Vec<Vec<char>> = grid.chars().filter(|ch| self.ctx.cols.contains(ch) || ['0', '.'].contains(ch)).map(|ch| vec![ch]).collect();
         if grid_chars.len() == 81 {
@@ -91,7 +104,7 @@ impl Sudoku {
         }
     }
 
-    fn parse_grid (&self, grid: &str) -> PuzzleResult {
+    fn parse_grid (&self, grid: &str) -> PuzzleResult<HashMap<String, Vec<char>>> {
         //  Convert grid to Some dict of possible values, [square, digits], or return None if a contradiction is detected.
         let mut values = HashMap::<String, Vec<char>>::with_capacity(81);
         for s in &self.ctx.squares { 
@@ -142,23 +155,7 @@ impl Sudoku {
         true
     }
 
-    pub fn display (&self, values: &HashMap<String, Vec<char>>) -> Vec<String> {
-        let width = 1 + (values.iter().map(|v| v.1.len()).max().unwrap());
-        let line = ["-"; 3].iter().map(|c| c.repeat(3*width)).collect::<Vec<String>>().join("+");
-        let mut lines = Vec::new();
-        for r in &self.ctx.rows {
-            lines.push(self.ctx.cols.iter()
-                        .map(|c| {  let s = [*r, *c].iter().collect::<String>();
-                                    format!("{0: ^1$}", values[&s].iter().collect::<String>(), width) + (if ['3', '6'].contains(c) {"|"} else {""})})                                             
-                        .collect::<String>());
-            if ['C', 'F'].contains(r) {
-                lines.push(line.clone());
-            }
-        }
-        lines
-    }
-
-    fn search (&self, values: HashMap<String, Vec<char>>) -> PuzzleResult {
+    fn search (&self, values: HashMap<String, Vec<char>>) -> PuzzleResult<HashMap<String, Vec<char>>> {
         // Using depth-first search and propagation, try all possible values
         if values.iter().all(|(_, v)| v.len() == 1) {
             return Ok(values);  // Solved!
@@ -174,9 +171,13 @@ impl Sudoku {
         Err(PuzzleError::Contradiction)
     }
 
-    pub fn solve (&self, grid: &str) -> PuzzleResult {
-        let values = self.parse_grid(grid)?;
-        Ok(self.search(values)?)
+    pub fn solve (&self, grid: &str) -> PuzzleResult<String> {
+        let values = self.parse_grid(grid).and_then(|v| {self.search(v)})?;
+        if self.solved(&values) {
+            Ok(self.ctx.squares.iter().map(|s| {values[s][0]}).collect::<String>())
+        } else {
+            Err(PuzzleError::Unsolved)
+        }
     }
 
     fn solved (&self, values: &HashMap<String, Vec<char>>) -> bool {
