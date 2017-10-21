@@ -3,5 +3,10 @@ name = "sudoku-solver"
 version = "0.1.0"
 authors = ["Rrogntudju"]
 
-[dependencies]
-pyo3 = "*"
+[lib]
+name = "sudokusolver"
+crate-type = ["cdylib"]
+
+[dependencies.pyo3]
+version = "*"
+features = ["extension-module"]

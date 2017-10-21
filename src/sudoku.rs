@@ -189,6 +189,26 @@ impl Sudoku {
         };
         self.ctx.unitlist.iter().all(|u| unitsolved(u))
     }  
+
+    pub fn display (grid: &str) -> PuzzleResult<Vec<String>> {
+        let grid_chars: Vec<char> = grid.chars().filter(|c| {"123456789".contains(*c) || ".0".contains(*c)}).collect();
+        if grid_chars.len() == 81 {
+            let width = 2;
+            let sep = ["-"; 3].iter().map(|c| c.repeat(3*width)).collect::<Vec<String>>().join("+");
+            let mut lines = Vec::<String>::new();
+            for r in grid_chars.chunks(9) {
+                lines.push(  r.chunks(3)
+                              .map(|s| {s.iter()
+                                         .map(|c| {format!("{0: ^1$}", c, width)})
+                                         .collect::<String>()})   
+                              .collect::<Vec<String>>()
+                              .join("|"));
+                lines.push(sep.clone());
+            }
+            lines.pop();  // remove the last separator
+            Ok(lines)            
+        } else {
+            Err(PuzzleError::InvalidGrid)
+        }
+    }
 }
-
-
