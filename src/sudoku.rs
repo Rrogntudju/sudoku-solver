@@ -205,7 +205,7 @@ impl Sudoku {
                               .join("|"));
                 lines.push(sep.clone());
             }
-            lines.pop();  // remove the last separator
+            lines.pop();  // to remove the last separator
             Ok(lines)            
         } else {
             Err(PuzzleError::InvalidGrid)
