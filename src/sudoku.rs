@@ -189,7 +189,7 @@ impl Sudoku {
             digits_values.sort();
             digits_values == self.ctx.cols.iter().map(char::to_string).collect::<Vec<String>>()
         };
-        self.ctx.unitlist.iter().all(|u| unitsolved(u))
+        self.ctx.unitlist.iter().all(unitsolved)
     }  
 
     pub fn display (grid: &str) -> PuzzleResult<Vec<String>> {
