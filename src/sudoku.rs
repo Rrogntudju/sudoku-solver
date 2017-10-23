@@ -165,7 +165,9 @@ impl Sudoku {
         for d in &values[s] {
             let mut cloned_values = values.clone();
             if self.assign(&mut cloned_values, s, d) {
-                return Ok(self.search(cloned_values)?);
+                if let Ok(svalues) = self.search(cloned_values) {
+                    return Ok(svalues);
+                }
             }
         }
         Err(PuzzleError::Contradiction)
@@ -196,13 +198,15 @@ impl Sudoku {
             let width = 2;
             let sep = ["-"; 3].iter().map(|c| c.repeat(3*width)).collect::<Vec<String>>().join("+");
             let mut lines = Vec::<String>::new();
-            for r in grid_chars.chunks(9) {
-                lines.push(  r.chunks(3)
-                              .map(|s| {s.iter()
-                                         .map(|c| {format!("{0: ^1$}", c, width)})
-                                         .collect::<String>()})   
-                              .collect::<Vec<String>>()
-                              .join("|"));
+            for s in grid_chars.chunks(27) {
+                for r in s.chunks(9) {
+                    lines.push(  r.chunks(3)
+                                .map(|s| {s.iter()
+                                            .map(|c| {format!("{0: ^1$}", c, width)})
+                                            .collect::<String>()})   
+                                .collect::<Vec<String>>()
+                                .join("|"));
+                }
                 lines.push(sep.clone());
             }
             lines.pop();  // to remove the last separator
