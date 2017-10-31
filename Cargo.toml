@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Rrogntudju"]
 
 [lib]
-name = "sudokusolver"
+name = "libsudokusolver"
 crate-type = ["cdylib"]
 
 [dependencies.pyo3]

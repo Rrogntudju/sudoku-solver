@@ -1,3 +1,10 @@
 /target/
 **/*.rs.bk
 Cargo.lock
+/build/
+/dist/
+/sudoku_solver.egg-info/
+/.vscode/
+/__pycache__/
+*.pyc
+
