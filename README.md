@@ -8,5 +8,5 @@
  pip install  */path_to_whl_file/whl_generated_from_build.whl*  --user
 ### To test the extension:
 python test_ss.py
-### To solve an evil puzzle from [Web Sudoku](http://www.websudoku.com/?level=4) Note: requires BeautifulSoup
+### To solve an evil puzzle from [Web Sudoku](http://www.websudoku.com/?level=4) (requires BeautifulSoup):
 python websudoku.py 
