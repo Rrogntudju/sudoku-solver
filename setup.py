@@ -9,4 +9,4 @@ setup(name='sudoku-solver',
       packages=['sudoku_solver'],
       # rust extensions are not zip safe, just like C-extensions.
       zip_safe=False
-)
+      )
