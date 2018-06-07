@@ -1,4 +1,5 @@
 #![feature(proc_macro)]
+#![feature(proc_macro_path_invoc)]
 extern crate pyo3;
 
 mod sudoku;
