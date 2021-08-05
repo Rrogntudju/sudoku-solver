@@ -3,7 +3,7 @@ from setuptools_rust import Binding, RustExtension, Strip
 
 setup(name='sudoku-solver',
       version='2.0',
-      rust_extensions=[RustExtension('sudoku_solver.libsudokusolver',
+      rust_extensions=[RustExtension('sudoku_solver.sudoku_solver',
                                      'Cargo.toml', binding=Binding.PyO3,
                                      strip=Strip.All)],
       packages=['sudoku_solver'],

@@ -1,4 +1,4 @@
-import sudoku_solver.libsudokusolver as ss
+import sudoku_solver as ss
 
 with open('./puzzles.txt') as f:
     CONTENT = f.read().splitlines()

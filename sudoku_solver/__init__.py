@@ -1,2 +1,1 @@
-from . import libsudokusolver
-__all__ = ['solve', 'display']
+from .sudoku_solver import *
