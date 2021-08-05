@@ -1,7 +1,8 @@
 [package]
 name = "sudoku-solver"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Rrogntudju"]
+edition = "2018"
 
 [lib]
 name = "libsudokusolver"
@@ -10,3 +11,10 @@ crate-type = ["cdylib"]
 [dependencies.pyo3]
 version = "*"
 features = ["extension-module"]
+
+[dependencies.ahash]
+version = "0.7"
+
+[profile.release]
+lto = "fat" 
+codegen-units = 1

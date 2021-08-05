@@ -1,25 +1,23 @@
-#![feature(proc_macro)]
-#![feature(proc_macro_path_invoc)]
-extern crate pyo3;
-
 mod sudoku;
 
+use pyo3::exceptions::ValueError;
 use pyo3::prelude::*;
 use sudoku::Sudoku;
 
-#[py::modinit(libsudokusolver)]
-fn init_mod(py: Python, m: &PyModule) -> PyResult<()> {
-
-    #[pyfn(m, "solve")]
+#[pymodule]
+fn libsudokusolver(py: Python, m: &PyModule) -> PyResult<()> {
+    #[pyfunction]
     fn solve(grid: String) -> PyResult<String> {
-        let sdk = Sudoku::new(); 
-        sdk.solve(&grid).map_err(|e| {PyErr::new::<exc::ValueError, _>(format!("{}", e))})
+        let sdk = Sudoku::new();
+        sdk.solve(&grid)
+            .map_err(|e| PyErr::new::<ValueError, _>(format!("{}", e)))
     }
 
-    #[pyfn(m, "display")]
+    #[pyfunction]
     fn display(grid: String) -> PyResult<()> {
-        let lines = Sudoku::display(&grid).map_err(|e| {PyErr::new::<exc::ValueError, _>(format!("{}", e))})?;
-        lines.iter().for_each(|l| {println!("{}", l)});
+        let lines =
+            Sudoku::display(&grid).map_err(|e| PyErr::new::<ValueError, _>(format!("{}", e)))?;
+        lines.iter().for_each(|l| println!("{}", l));
         Ok(())
     }
 
