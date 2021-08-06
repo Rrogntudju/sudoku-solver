@@ -1,13 +1,14 @@
-import sudoku_solver as ss
+from sudoku_solver import Solver
 
 with open('./puzzles.txt') as f:
     CONTENT = f.read().splitlines()
 solved = 0
+ss = Solver()
 for line in CONTENT:
     try:
-        ss.display(line)
+        Solver.display(line)
         print('')
-        ss.display(ss.solve(line))
+        Solver.display(ss.solve(line))
         solved = solved + 1
     except ValueError as ex:
         print(line)

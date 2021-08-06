@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import urllib3
-import sudoku_solver as ss
+from sudoku_solver import Solver
 
 http = urllib3.PoolManager()
 
@@ -17,6 +17,6 @@ ids = ["f" + str(j) + str(i) for i in range(9) for j in range(9)]
 puzzle = "".join([puzzle_values[id] if id in puzzle_values else "0" for id in ids])
 
 # Solve
-ss.display(puzzle)
+Solver.display(puzzle)
 print(" ")
-ss.display(ss.solve(puzzle))
+Solver.display(Solver().solve(puzzle))
