@@ -9,7 +9,7 @@ for line in CONTENT:
         Solver.display(line)
         print('')
         Solver.display(ss.solve(line))
-        solved = solved + 1
+        solved += 1
     except ValueError as ex:
         print(line)
         print(ex.message)
