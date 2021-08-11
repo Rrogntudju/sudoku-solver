@@ -1,6 +1,8 @@
 from sudoku_solver import Solver
+from pathlib import Path
 
-with open('./puzzles.txt') as f:
+parent = Path(__file__).resolve().parent
+with open(parent.joinpath('puzzles.txt')) as f:
     CONTENT = f.read().splitlines()
 solved = 0
 ss = Solver()
