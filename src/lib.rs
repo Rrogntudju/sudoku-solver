@@ -1,19 +1,24 @@
 mod sudoku;
 
+use lazy_static::lazy_static;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use sudoku::Sudoku;
+use sudoku::{legos, Sudoku};
+
+lazy_static! {
+    static ref BRICKS: (Vec<char>, Vec<char>, Vec<String>, Vec<Vec<String>>) = legos();
+}
 
 #[pyclass]
 struct Solver {
-    ss: Sudoku,
+    ss: Sudoku<'static>,
 }
 
 #[pymethods]
 impl Solver {
     #[new]
     fn new() -> Self {
-        let ss = Sudoku::new();
+        let ss = Sudoku::new(BRICKS.0.clone(), BRICKS.1.clone(), &BRICKS.2, &BRICKS.3);
         Solver { ss }
     }
 
