@@ -1,8 +1,6 @@
-mod sudoku;
-
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use sudoku::Sudoku;
+use sudoku::solver::Sudoku;
 
 #[pyclass]
 struct Solver {
