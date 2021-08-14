@@ -1,7 +1,7 @@
 # sudoku-solver
  A Rust extension for Python.
  ### To build the extension:
- 1. Install [Rustup](https://github.com/rust-lang-nursery/rustup.rs#installation) with the nightly toolchain. Note: the nightly toolchain is required for PyO3.
+ 1. Install [Rustup](https://github.com/rust-lang-nursery/rustup.rs#installation)
  2. pip install setuptools_rust --user
  3. pip install wheel --user
  4. python setup.py bdist_wheel
