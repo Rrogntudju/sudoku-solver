@@ -2,19 +2,19 @@
 name = "sudoku-solver"
 version = "0.2.0"
 authors = ["Rrogntudju"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "sudoku_solver"
 crate-type = ["cdylib"]
 
 [dependencies.pyo3]
-version = "0.14"
+version = "0.17"
 features = ["extension-module"]
 
 [dependencies.sudoku]
 git = "https://github.com/Rrogntudju/sudoku-rs.git"
 
 [profile.release]
-lto = "fat" 
+lto = "fat"
 codegen-units = 1
